@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source helpers
+for lib in "$REPO_ROOT/lib/"*; do
+  [[ -f "$lib" ]] || continue
+  source "$lib"
+done
+
+: "${OS:=unknown}"
+
+log "yadm bootstrap starting on $OS"
+
+run_steps() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0
+  for step in "$dir"/*; do
+    [[ -f "$step" ]] || continue
+    log "--> $(basename "$step")"
+    source "$step"
+  done
+}
+
+run_steps "$REPO_ROOT/bootstrap.d/common"
+
+if [[ -d "$REPO_ROOT/bootstrap.d/$OS" ]]; then
+  run_steps "$REPO_ROOT/bootstrap.d/$OS"
+else
+  warn "no bootstrap steps for OS=$OS"
+fi
+
+log "bootstrap done"

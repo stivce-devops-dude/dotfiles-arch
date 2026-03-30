@@ -1,0 +1,7 @@
+# lib/os — detect OS and export $OS
+case "$(uname -s)" in
+  Darwin) OS="macos" ;;
+  Linux)  OS="linux" ;;
+  *)      OS="unknown" ;;
+esac
+export OS

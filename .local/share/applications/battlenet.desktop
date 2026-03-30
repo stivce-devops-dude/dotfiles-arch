@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Battle.net
+Comment=Blizzard Battle.net Launcher
+Exec=/home/sn0w/.local/bin/battlenet
+Icon=/usr/share/icons/WhiteSur/apps/scalable/battlenet.svg
+Terminal=false
+Categories=Game;

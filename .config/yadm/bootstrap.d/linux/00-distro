@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${REPO_ROOT:?REPO_ROOT not set}"
+
+if [[ ! -r /etc/os-release ]]; then
+  warn "No /etc/os-release found, skipping distro bootstrap"
+  return 0
+fi
+
+. /etc/os-release
+
+run_distro_steps() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0
+  for step in "$dir"/*; do
+    [[ -f "$step" ]] || continue
+    log "--> ${ID}/$(basename "$step")"
+    # shellcheck disable=SC1090
+    source "$step"
+  done
+}
+
+case "$ID" in
+  arch)   run_distro_steps "$REPO_ROOT/bootstrap.d/linux/arch" ;;
+  ubuntu) run_distro_steps "$REPO_ROOT/bootstrap.d/linux/ubuntu" ;;
+  *)      warn "Unknown Linux distro: $ID (skipping distro-specific bootstrap)" ;;
+esac

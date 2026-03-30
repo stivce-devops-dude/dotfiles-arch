@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WALLPAPER_DIR="$HOME/Pictures/wallpapers"
+STATE_FILE="$HOME/.cache/current_wallpaper_index"
+
+pgrep -x awww-daemon >/dev/null 2>&1 || awww-daemon --format xrgb &
+sleep 0.3
+
+WALLPAPERS=($(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | sort))
+
+NUM_WALLS=${#WALLPAPERS[@]}
+if [[ "$NUM_WALLS" -eq 0 ]]; then
+    echo "No wallpapers found." >&2
+    exit 1
+fi
+
+INDEX=$([[ -f "$STATE_FILE" ]] && cat "$STATE_FILE" || echo 0)
+INDEX=$(( (INDEX + 1) % NUM_WALLS ))
+echo "$INDEX" > "$STATE_FILE"
+
+SELECTED="${WALLPAPERS[$INDEX]}"
+awww img "$SELECTED"

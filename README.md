@@ -2,10 +2,12 @@
 
 Arch Linux-specific dotfiles managed with yadm.
 
-| CI Job | Badge |
-|--------|-------|
-| Lint | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=lint)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
-| Test Arch | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=test-arch)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
+## CI Jobs
+
+| CI Job | Description |
+|--------|-------------|
+| **Lint** — bash/zsh syntax validation | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=lint)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
+| **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=test-arch)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
 
 ## Setup
 
@@ -33,14 +35,6 @@ yadm bootstrap
 | `.config/yadm/bootstrap.d/linux/arch/13-pacman-desktop.sh` | Desktop environment packages |
 | `.config/yadm/bootstrap.d/linux/arch/14-pacman-extras.sh` | Extra packages (fonts, utils) |
 | `.config/yadm/bootstrap.d/linux/arch/15-gaming.sh` | Gaming packages (umu-launcher, wine, gamescope) |
-
-## CI Tests
-
-| Job | Description |
-|-----|-------------|
-| Lint | bash/zsh syntax validation on all shell scripts |
-| Deploy | Tests config deployment on Arch |
-| Integration | zsh config loading, starship |
 
 ## Dependencies
 

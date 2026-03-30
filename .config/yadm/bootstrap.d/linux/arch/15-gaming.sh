@@ -23,40 +23,14 @@ fi
 
 log "Dedicated GPU detected. Installing gaming packages..."
 
-INSTALL_SCRIPT="${HOME}/install-battlenet"
-
-if [[ -f "$INSTALL_SCRIPT" ]]; then
+if [[ -f "$REPO_ROOT/install-gaming" ]]; then
     log "Running gaming setup script..."
-    chmod +x "$INSTALL_SCRIPT"
+    chmod +x "$REPO_ROOT/install-gaming"
     if [[ ${EUID:-0} -eq 0 ]] && [[ -n "${SUDO_USER:-}" ]]; then
-        sudo -u "$SUDO_USER" bash "$INSTALL_SCRIPT"
+        sudo -u "$SUDO_USER" bash "$REPO_ROOT/install-gaming"
     else
-        bash "$INSTALL_SCRIPT"
+        bash "$REPO_ROOT/install-gaming"
     fi
 else
-    warn "install-battlenet script not found in repo"
-fi
-    if command -v nvidia-smi &>/dev/null && nvidia-smi &>/dev/null; then
-        return 0
-    fi
-    return 1
-}
-
-if ! has_dgpu; then
-    log "No dedicated GPU detected. Skipping gaming packages."
-    return 0
-fi
-
-log "Dedicated GPU detected. Installing gaming packages..."
-
-if [[ -f "$REPO_ROOT/install-battlenet" ]]; then
-    log "Running gaming setup script..."
-    chmod +x "$REPO_ROOT/install-battlenet"
-    if [[ ${EUID:-0} -eq 0 ]] && [[ -n "${SUDO_USER:-}" ]]; then
-        sudo -u "$SUDO_USER" bash "$REPO_ROOT/install-battlenet"
-    else
-        bash "$REPO_ROOT/install-battlenet"
-    fi
-else
-    warn "install-battlenet script not found in repo"
+    warn "install-gaming script not found"
 fi

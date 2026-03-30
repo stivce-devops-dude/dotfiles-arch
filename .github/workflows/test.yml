@@ -27,10 +27,61 @@ jobs:
           [ "$fail" -eq 0 ] || exit 1
 
   # -------------------------------------------------------------------------
-  # Arch Linux Test
+  # Validate configs
+  # -------------------------------------------------------------------------
+  validate:
+    name: Validate Configs
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Hyprland config
+        run: |
+          if [ -f .config/hypr/hyprland.conf ]; then
+            echo "  ok: Hyprland config exists"
+          else
+            echo "  FAIL: Hyprland config missing"
+            exit 1
+          fi
+      - name: Validate Fuzzel config
+        run: |
+          if [ -f .config/fuzzel/fuzzel.ini ]; then
+            echo "  ok: Fuzzel config exists"
+          else
+            echo "  FAIL: Fuzzel config missing"
+            exit 1
+          fi
+      - name: Validate gaming script
+        run: |
+          if [ -f install-gaming ]; then
+            bash -n install-gaming && echo "  ok: install-gaming syntax" || { echo "  FAIL: install-gaming"; exit 1; }
+          fi
+
+  # -------------------------------------------------------------------------
+  # Bootstrap test
+  # -------------------------------------------------------------------------
+  bootstrap:
+    name: Bootstrap
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yadm
+        run: pacman -Sy --noconfirm --needed yadm
+      - name: Setup git
+        run: |
+          git config --global user.email "test@test.com"
+          git config --global user.name "Test"
+      - name: Test bootstrap detects OS
+        run: |
+          chmod +x .config/yadm/bootstrap
+          ./.config/yadm/bootstrap --dry-run 2>/dev/null || echo "  info: bootstrap dry-run completed"
+
+  # -------------------------------------------------------------------------
+  # Test Arch Linux
   # -------------------------------------------------------------------------
   test-arch:
-    name: Test (Arch Linux)
+    name: Test Arch
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:

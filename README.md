@@ -1,8 +1,11 @@
 # dotfiles-arch
 
-[![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml)
-
 Arch Linux-specific dotfiles managed with yadm.
+
+| CI Job | Badge |
+|--------|-------|
+| Lint | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=lint)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
+| Test Arch | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=test-arch)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
 
 ## Setup
 
@@ -33,9 +36,11 @@ yadm bootstrap
 
 ## CI Tests
 
-- **Lint**: bash/zsh syntax on all shell scripts
-- **Deploy**: Tests config deployment on Arch
-- **Integration**: zsh config loading, starship
+| Job | Description |
+|-----|-------------|
+| Lint | bash/zsh syntax validation on all shell scripts |
+| Deploy | Tests config deployment on Arch |
+| Integration | zsh config loading, starship |
 
 ## Dependencies
 

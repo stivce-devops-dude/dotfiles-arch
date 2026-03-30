@@ -58,6 +58,63 @@ jobs:
           fi
 
   # -------------------------------------------------------------------------
+  # Test packages in pacman
+  # -------------------------------------------------------------------------
+  test-packages:
+    name: Test Packages
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync pacman
+        run: pacman -Sy
+      - name: Check core packages exist in pacman
+        run: |
+          CORE="$PWD/../dotfiles/.config/yadm/packages/core.txt"
+          while IFS= read -r pkg; do
+            [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+            if pacman -Si "$pkg" &>/dev/null; then
+              echo "  ok: $pkg in pacman"
+            else
+              echo "  WARN: $pkg not in pacman (may be AUR)"
+            fi
+          done < "$CORE"
+      - name: Check UI packages exist in pacman
+        run: |
+          UI_PKGS=(
+            hyprland
+            hyprlock
+            waybar
+            fuzzel
+            kitty
+            matugen
+            whitesur-icon-theme
+            whitesur-gtk-theme
+            graphite-gtk-theme
+          )
+          for pkg in "${UI_PKGS[@]}"; do
+            if pacman -Si "$pkg" &>/dev/null; then
+              echo "  ok: $pkg in pacman"
+            else
+              echo "  WARN: $pkg not in pacman (may be AUR)"
+            fi
+          done
+      - name: Check gaming packages exist in pacman
+        run: |
+          GAMING_PKGS=(
+            umu-launcher
+            wine
+            gamescope
+          )
+          for pkg in "${GAMING_PKGS[@]}"; do
+            if pacman -Si "$pkg" &>/dev/null; then
+              echo "  ok: $pkg in pacman"
+            else
+              echo "  WARN: $pkg not in pacman (may be AUR)"
+            fi
+          done
+
+  # -------------------------------------------------------------------------
   # Bootstrap test
   # -------------------------------------------------------------------------
   bootstrap:

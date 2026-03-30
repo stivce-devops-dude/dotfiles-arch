@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: pacman -Sy --noconfirm --needed bash zsh
+      - name: bash -n bootstrap scripts
+        run: |
+          fail=0
+          while IFS= read -r -d '' f; do
+            bash -n "$f" && echo "  ok: $f" || { echo "  FAIL: $f"; fail=1; }
+          done < <(find .config/yadm -type f \( -name "bootstrap*" -o -path "*/bootstrap.d/*" \) -print0)
+          [ "$fail" -eq 0 ] || exit 1

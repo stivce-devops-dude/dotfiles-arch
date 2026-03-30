@@ -1,0 +1,30 @@
+name: Test Arch
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-arch:
+    name: Test Arch
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: pacman -Sy --noconfirm --needed zsh fzf starship neovim git
+      - name: Deploy dotfiles
+        run: |
+          chmod +x ci/deploy-dotfiles.sh
+          ci/deploy-dotfiles.sh linux-arch
+      - name: Generate fzf integration
+        run: |
+          if fzf --zsh >/dev/null 2>&1; then fzf --zsh > "$HOME/.fzf.zsh"
+          else touch "$HOME/.fzf.zsh"; fi
+      - name: Test starship
+        run: |
+          starship help >/dev/null 2>&1 && echo "  ok: starship works" || { echo "  FAIL: starship"; exit 1; }
+      - name: Run tests
+        run: zsh ci/test-zshrc.zsh

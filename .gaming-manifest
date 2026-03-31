@@ -1,0 +1,13 @@
+# Gaming branch files
+# These files are only included when DOTFILES_BRANCH=gaming
+
+# Launchers
+.local/bin/battlenet
+.local/bin/fuzzel-launcher
+.local/share/applications/battlenet.desktop
+
+# Bootstrap scripts
+.config/yadm/bootstrap.d/linux/arch/15-gaming.sh
+
+# Standalone install script (run manually)
+install-gaming

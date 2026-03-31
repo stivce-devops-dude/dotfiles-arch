@@ -4,13 +4,13 @@ Arch Linux-specific dotfiles managed with yadm.
 
 ## CI Jobs
 
-| CI Job | Description |
-|--------|-------------|
-| **Lint** — bash/zsh syntax validation | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=lint)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
-| **Validate Configs** — Hyprland, Fuzzel, gaming | [![Validate Configs](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=validate)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
-| **Package Availability** — verify packages in pacman | [![Package Availability](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=package-availability)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
-| **Bootstrap** — dry-run bootstrap test | [![Bootstrap](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=bootstrap)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
-| **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml/badge.svg?job=test-arch)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test.yml) |
+| CI Job | Badge |
+|--------|-------|
+| **Lint** — bash/zsh syntax validation | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml) |
+| **Config Validation** — Hyprland, Fuzzel, gaming | [![Config Validation](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml) |
+| **Package Availability** — verify packages in pacman | [![Package Availability](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml) |
+| **Bootstrap** — dry-run bootstrap test | [![Bootstrap](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml) |
+| **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml) |
 
 ## Setup
 

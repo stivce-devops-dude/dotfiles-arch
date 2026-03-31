@@ -6,10 +6,10 @@ Arch Linux-specific dotfiles managed with [yadm](https://yadm.io/).
 
 | CI Job | Description |
 |--------|-------------|
-| **Lint** — bash/zsh syntax + shellcheck | |
-| **Config Validation** — verify configs | |
-| **Bootstrap** — dry-run bootstrap test | |
-| **Test Arch** — deploy & integration | |
+| **Lint** — bash/zsh syntax + shellcheck | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml) |
+| **Config Validation** — verify configs | [![Config Validation](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml) |
+| **Bootstrap** — dry-run bootstrap test | [![Bootstrap](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml) |
+| **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml) |
 | **Package Availability** — verify packages in pacman | |
 
 ## Setup

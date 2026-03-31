@@ -1,0 +1,9 @@
+# Desktop packages for Arch Linux
+# Managed by bootstrap: 13-pacman-desktop.sh
+
+nautilus
+zen-browser
+mpv
+imv
+wdisplays
+swappy

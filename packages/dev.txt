@@ -1,0 +1,20 @@
+# Development packages for Arch Linux
+# Managed by bootstrap: 11-pacman-dev.sh
+
+base-devel
+python3
+python-pip
+go
+rust
+nodejs
+npm
+git
+lazygit
+fzf
+ripgrep
+fd
+bat
+exa
+zoxide
+unzip
+zip

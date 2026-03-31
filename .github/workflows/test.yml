@@ -69,7 +69,7 @@ jobs:
       - name: Checkout general dotfiles
         run: git clone --depth 1 https://github.com/stivce-devops-dude/dotfiles.git ../dotfiles
       - name: Sync pacman
-        run: pacman -Sy
+        run: pacman -Sy --noconfirm
       - name: Check core packages exist in pacman
         run: |
           CORE="$PWD/../dotfiles/.config/yadm/packages/core.txt"

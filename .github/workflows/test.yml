@@ -60,8 +60,8 @@ jobs:
   # -------------------------------------------------------------------------
   # Test packages in pacman
   # -------------------------------------------------------------------------
-  test-packages:
-    name: Test Packages
+  package-availability:
+    name: Package Availability
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:

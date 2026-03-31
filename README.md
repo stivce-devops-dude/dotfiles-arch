@@ -10,7 +10,7 @@ Arch Linux-specific dotfiles managed with [yadm](https://yadm.io/).
 | **Config Validation** — verify configs | [![Config Validation](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml) |
 | **Bootstrap** — dry-run bootstrap test | [![Bootstrap](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml) |
 | **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml) |
-| **Package Availability** — verify packages in pacman | |
+| **Package Availability** — verify packages in pacman | [![Package Availability](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml) |
 
 ## Setup
 

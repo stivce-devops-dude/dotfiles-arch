@@ -66,6 +66,8 @@ jobs:
     container: archlinux:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout general dotfiles
+        run: git clone --depth 1 https://github.com/stivce-devops-dude/dotfiles.git ../dotfiles
       - name: Sync pacman
         run: pacman -Sy
       - name: Check core packages exist in pacman

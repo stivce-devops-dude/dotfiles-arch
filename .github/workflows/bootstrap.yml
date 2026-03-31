@@ -2,9 +2,9 @@ name: Bootstrap
 
 on:
   push:
-    branches: [main, beta]
+    branches: [minimal, gaming]
   pull_request:
-    branches: [main]
+    branches: [minimal]
 
 jobs:
   bootstrap:

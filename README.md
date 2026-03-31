@@ -15,16 +15,35 @@ Arch Linux-specific dotfiles managed with yadm.
 ## Setup
 
 ```bash
-yadm clone git@github.com:stivce-devops-dude/dotfiles-arch.git
+# Minimal (base config only)
+yadm clone git@github.com:stivce-devops-dude/dotfiles-arch.git --branch minimal
 yadm bootstrap
+
+# Or with gaming additions
+DOTFILES_INCLUDE_GAMING=1 yadm bootstrap
 ```
 
-## What's Included
+## Branches
+
+| Branch | Files | Description |
+|--------|-------|-------------|
+| `minimal` | ~60 | Base Arch config (Hyprland, kitty, dev tools, desktop) |
+| `gaming` | ~5 | Gaming additions only (battlenet, wine, umu) |
+
+The `gaming` branch is designed to be applied on top of `minimal` by setting `DOTFILES_INCLUDE_GAMING=1`.
+
+## What's Included (minimal)
 
 - Hyprland + Wayland config
-- Fuzzel launcher
+- Fuzzel app launcher
 - GTK/Qt theming (WhiteSur, Graphite)
-- Gaming setup (UMU, Wine, etc.)
+- Development tools
+
+## What's Included (gaming)
+
+- Battle.net launcher
+- UMU/Wine setup
+- Gaming-specific bootstrap script
 
 ## Bootstrap Scripts
 

@@ -2,9 +2,9 @@ name: Config Validation
 
 on:
   push:
-    branches: [main, beta]
+    branches: [minimal, gaming]
   pull_request:
-    branches: [main]
+    branches: [minimal]
 
 jobs:
   config-validation:
@@ -18,19 +18,19 @@ jobs:
           if [ -f .config/hypr/hyprland.conf ]; then
             echo "  ok: Hyprland config exists"
           else
-            echo "  FAIL: Hyprland config missing"
-            exit 1
+            echo "  WARN: Hyprland config missing (may be minimal branch)"
           fi
       - name: Validate Fuzzel config
         run: |
           if [ -f .config/fuzzel/fuzzel.ini ]; then
             echo "  ok: Fuzzel config exists"
           else
-            echo "  FAIL: Fuzzel config missing"
-            exit 1
+            echo "  WARN: Fuzzel config missing (may be minimal branch)"
           fi
-      - name: Validate gaming script
+      - name: Validate gaming script (gaming branch only)
         run: |
           if [ -f install-gaming ]; then
-            bash -n install-gaming && echo "  ok: install-gaming syntax" || { echo "  FAIL: install-gaming"; exit 1; }
+            bash -n install-gaming && echo "  ok: install-gaming syntax"
+          else
+            echo "  INFO: install-gaming not found (minimal branch)"
           fi

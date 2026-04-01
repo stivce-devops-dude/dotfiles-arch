@@ -4,6 +4,39 @@ set -euo pipefail
 SRC="$HOME/.config/zen/user.js"
 [[ -f "$SRC" ]] || { echo "No user.js found at $SRC"; exit 1; }
 
+# Check if any profile exists
+has_profile() {
+    for p in "$HOME"/.config/zen/*.Default*; do
+        [[ -d "$p" ]] && return 0
+    done
+    return 1
+}
+
+# If no profile exists, launch Zen briefly to create one
+if ! has_profile; then
+    echo "==> No Zen profile found, launching Zen to create one..."
+    zen-browser --headless &
+    ZEN_PID=$!
+
+    # Wait for profile to appear (up to 15 seconds)
+    for i in $(seq 1 30); do
+        if has_profile; then
+            break
+        fi
+        sleep 0.5
+    done
+
+    kill "$ZEN_PID" 2>/dev/null || true
+    wait "$ZEN_PID" 2>/dev/null || true
+    sleep 1
+
+    if ! has_profile; then
+        echo "ERROR: Zen profile was not created. Launch Zen manually first."
+        exit 1
+    fi
+fi
+
+# Apply user.js to all profiles
 for profile in "$HOME"/.config/zen/*.Default*; do
     [[ -d "$profile" ]] || continue
     cp "$SRC" "$profile/user.js"

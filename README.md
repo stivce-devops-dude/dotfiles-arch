@@ -1,69 +1,39 @@
 # dotfiles-arch
 
-Arch Linux-specific dotfiles managed with [yadm](https://yadm.io/).
-
-## CI Jobs
-
-| CI Job | Description |
-|--------|-------------|
-| **Lint** — bash/zsh syntax + shellcheck | [![Lint](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/lint.yml) |
-| **Config Validation** — verify configs | [![Config Validation](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/config-validation.yml) |
-| **Bootstrap** — dry-run bootstrap test | [![Bootstrap](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/bootstrap.yml) |
-| **Test Arch** — deploy & integration | [![Test Arch](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/test-arch.yml) |
-| **Package Availability** — verify packages in pacman | [![Package Availability](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml/badge.svg)](https://github.com/stivce-devops-dude/dotfiles-arch/actions/workflows/package-availability.yml) |
+Arch Linux-specific dotfiles. Managed as a bare git repo.
 
 ## Setup
 
 ```bash
-# Default: minimal (base config only)
-yadm clone git@github.com:stivce-devops-dude/dotfiles-arch.git
-yadm bootstrap
-
-# With gaming additions
-DOTFILES_INCLUDE_GAMING=1 yadm bootstrap
+git clone --bare git@github.com:stivce-devops-dude/dotfiles-arch.git ~/.dotfiles-os
+git --git-dir=$HOME/.dotfiles-os --work-tree=$HOME checkout
 ```
 
-## Branches
+Add to your shell profile:
 
-| Branch | Files | Description |
-|--------|-------|-------------|
-| `minimal` (default) | ~60 | Base Arch config |
-| `gaming` | ~5 | Gaming additions only |
+```bash
+alias dot-os='git --git-dir=$HOME/.dotfiles-os --work-tree=$HOME'
+dot-os config status.showUntrackedFiles no
+```
 
-The `gaming` branch is applied on top of `minimal` when `DOTFILES_INCLUDE_GAMING=1`.
+## What's included
 
-## What's Included
+- **Hyprland** — `.config/hypr/` (compositor, lock screen, panel, wallpaper)
+- **Bar** — `.config/waybar/` (config, styling)
+- **Launcher** — `.config/fuzzel/fuzzel.ini`
+- **Notifications** — `.config/swaync/` (config, styling)
+- **Theming** — `.config/gtk-*/`, `.config/qt5ct/`, `.config/qt6ct/`, `.config/matugen/`
+- **Misc** — `.config/xsettingsd/`, `Pictures/wallpapers/`
 
-- **Window Manager**: Hyprland + Wayland
-- **App Launcher**: Fuzzel
-- **Themes**: GTK (WhiteSur, Graphite), Qt
-- **Terminal**: kitty
-- **Development**: go, rust, nodejs, lazygit, fzf, ripgrep
+## Usage
 
-## Bootstrap Scripts
+```bash
+dot-os add ~/.config/hypr/hyprland/binds.conf
+dot-os commit -m "update hyprland keybinds"
+dot-os push
+```
 
-| Script | Description |
-|--------|-------------|
-| `.config/yadm/bootstrap` | Main bootstrap |
-| `bootstrap.d/linux/00-distro` | Linux distribution detection |
-| `bootstrap.d/linux/arch/10-pacman-core.sh` | Core packages |
-| `bootstrap.d/linux/arch/11-pacman-dev.sh` | Development packages |
-| `bootstrap.d/linux/arch/12-pacman-ui.sh` | UI packages |
-| `bootstrap.d/linux/arch/13-pacman-desktop.sh` | Desktop packages |
-| `bootstrap.d/linux/arch/14-pacman-extras.sh` | Extra packages |
-| `bootstrap.d/linux/arch/15-gaming.sh` | Gaming packages |
+## Related repos
 
-## Package Lists
-
-| File | Description |
-|------|-------------|
-| `packages/core.txt` | Core system packages |
-| `packages/dev.txt` | Development packages |
-| `packages/ui.txt` | UI/desktop packages |
-| `packages/desktop.txt` | Desktop applications |
-| `packages/gaming.txt` | Gaming packages |
-| `packages/extras.txt` | Extra packages |
-
-## Dependencies
-
-Requires the general dotfiles repo for shared packages.
+- [dotfiles](https://github.com/stivce-devops-dude/dotfiles) — Shared dotfiles (zsh, nvim, starship, kitty base, git)
+- [os-configuration](https://github.com/stivce-devops-dude/os-configuration) — Ansible playbook for package management and system setup

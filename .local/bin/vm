@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# vm -- Fuzzel-driven VM management + auto-Looking-Glass under Hyprland
+
+set -euo pipefail
+IFS=$'\n\t'
+
+#--------------------------------------------------
+# Configuration
+#--------------------------------------------------
+readonly DISK_DIR="$HOME/Virtualization/disks"
+readonly ISO_DIR="$HOME/Virtualization/isos"
+# Default RAM/CPU -- override with: vm --ram 4096 --cpu 2
+DEFAULT_RAM_MB=8192
+DEFAULT_CPU_CORES=6
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --ram) DEFAULT_RAM_MB=$2; shift 2 ;;
+        --cpu) DEFAULT_CPU_CORES=$2; shift 2 ;;
+        *) break ;;
+    esac
+done
+readonly DEFAULT_RAM_MB DEFAULT_CPU_CORES
+
+#--------------------------------------------------
+# Wrappers & notifs
+#--------------------------------------------------
+menu_cmd()     { fuzzel --dmenu "$@"; }
+virsh_cmd()    { virsh --connect qemu:///system "$@"; }
+virt_install() { virt-install --connect qemu:///system "$@"; }
+virt_viewer()  { virt-viewer --connect qemu:///system "$@"; }
+notify_info()  { notify-send "VM Manager" "$1"; }
+notify_error() { notify-send -u critical "VM Manager" "$1"; }
+trap 'notify_error "Error on line $LINENO: $BASH_COMMAND"' ERR
+
+#--------------------------------------------------
+# UI helpers
+#--------------------------------------------------
+choose()        { printf '%s\n' "$2" | menu_cmd --prompt "$1: "; }
+get_vm_list()   { virsh_cmd list --all --name; }
+get_vm_status() { virsh_cmd domstate "$1" 2>/dev/null; }
+
+select_vm() {
+    local vms menu vm
+    vms=$(get_vm_list)
+    [[ -z $vms ]] && echo "__NO_VMS__" && return
+    menu="Create New VM"
+    while IFS= read -r vm; do
+        [[ -z $vm ]] && continue
+        menu+=$'\n'"$vm [$(get_vm_status "$vm")]"
+    done <<<"$vms"
+    choose "Select or Create VM" "$menu"
+}
+
+select_action() {
+    choose "Action for '$1'?" $'Start\nStop\nReboot\nForce Stop (Destroy)\nStatus\nView\nDelete\nCancel'
+}
+
+confirm_prompt() {
+    local r; r=$(choose "$1" $'Yes\nNo'); [[ -z $r ]] && r=Yes; [[ $r == Yes ]]
+}
+
+#--------------------------------------------------
+# Delete VM + disk
+#--------------------------------------------------
+delete_vm() {
+    local vm=$1 f
+    confirm_prompt "Delete VM '$vm'?" || return
+    f=$(virsh_cmd domblklist "$vm" --details | awk '/file/ {print $4; exit}')
+    [[ $(get_vm_status "$vm") == running ]] && virsh_cmd destroy "$vm"
+    virsh_cmd undefine --remove-all-storage --nvram "$vm"
+    notify_info "VM '$vm' removed."
+    if [[ -n $f && $f == "${DISK_DIR}"* && -f $f ]]; then
+        confirm_prompt "Delete disk '$f'?" && rm -f "$f" && notify_info "Disk deleted."
+    fi
+}
+
+#--------------------------------------------------
+# Detect & launch Looking-Glass
+#--------------------------------------------------
+check_and_launch_lg() {
+    local vm=$1 lgbin xml
+
+    # find client
+    if ! lgbin=$(command -v looking-glass-client); then
+        notify_error "looking-glass-client not found, skipping LG"
+        return
+    fi
+
+    # grab xml
+    xml=$(virsh_cmd dumpxml "$vm")
+    if echo "$xml" | grep -q looking-glass; then
+        notify_info "Found looking-glass in XML for '$vm'"
+    else
+        notify_info "No looking-glass entry in XML for '$vm'; skipping LG"
+        return
+    fi
+
+    # wait for running state
+    notify_info "Waiting for '$vm' to reach running..."
+    until [[ "$(get_vm_status "$vm")" == "running" ]]; do sleep 1; done
+
+    # launch under Wayland
+    notify_info "Launching Looking-Glass client for '$vm'"
+    setsid env \
+        WAYLAND_DISPLAY="$WAYLAND_DISPLAY" \
+        XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
+        "$lgbin" -F >/dev/null 2>&1 &
+}
+
+#--------------------------------------------------
+# Perform action
+#--------------------------------------------------
+execute_action() {
+    local vm=$1 action=$2
+    case "$action" in
+        Start)
+            if virsh_cmd start "$vm"; then
+                notify_info "Started '$vm'"
+                check_and_launch_lg "$vm" &
+            fi
+            ;;
+        Stop)
+            virsh_cmd shutdown "$vm" && notify_info "Shutdown '$vm'" ;;
+        Reboot)
+            virsh_cmd reboot "$vm"   && notify_info "Rebooted '$vm'" ;;
+        "Force Stop (Destroy)")
+            virsh_cmd destroy "$vm"  && notify_info "Force-stopped '$vm'" ;;
+        Status)
+            virsh_cmd dominfo "$vm" | choose "Status of '$vm'" >/dev/null ;;
+        View)
+            virt_viewer "$vm" & ;;
+        Delete)
+            delete_vm "$vm" ;;
+        Cancel|"")
+            exit 0 ;;
+        *)
+            notify_error "Unknown action: $action" ;;
+    esac
+}
+
+#--------------------------------------------------
+# ISO browser & new VM wizard
+#--------------------------------------------------
+browse_iso() {
+    local dir="$ISO_DIR" sel menu e
+    [[ ! -d $dir || -z "$(find "$dir" -mindepth 1 -print -quit)" ]] && dir="$HOME"
+    while :; do
+        menu=''
+        while IFS= read -r e; do
+            [[ -d $dir/$e ]] && menu+="$e/"$'\n'
+            [[ "${e,,}" == *.iso ]] && menu+="$e"$'\n'
+        done < <(find "$dir" -maxdepth 1 -mindepth 1 -printf "%P\n" | sort)
+        [[ -z $menu ]] && { notify_error "Empty: $dir"; return 1; }
+        menu=$'..\n'$menu
+        sel=$(choose "Browse: $dir" "$menu") || return 1
+        if [[ $sel == ".." ]]; then dir=$(dirname "$dir")
+        elif [[ $sel == */   ]]; then dir="$dir/${sel%/}"
+        else echo "$dir/$sel"; return 0; fi
+    done
+}
+
+create_vm() {
+    local name size ram cpu iso disk
+    name=$(choose "VM name:" "") || return
+    size=$(choose "Disk size (GB):" "") || return
+    # Prompt with defaults and fall back if empty
+    ram=$(choose "RAM (MB) [${DEFAULT_RAM_MB}]:" "") || true
+    [[ -z $ram ]] && ram=$DEFAULT_RAM_MB
+    cpu=$(choose "CPU cores [${DEFAULT_CPU_CORES}]:" "") || true
+    [[ -z $cpu ]] && cpu=$DEFAULT_CPU_CORES
+    iso=$(browse_iso)                || return
+
+    mkdir -p "$DISK_DIR"
+    disk="$DISK_DIR/${name}.qcow2"
+    qemu-img create -f qcow2 "$disk" "${size}G"
+
+    (
+      virt_install --name "$name" --vcpus "$cpu" --memory "$ram" \
+                   --cdrom "$iso" --disk path="$disk",format=qcow2 \
+                   --os-variant detect=on,name=generic \
+                   --boot uefi --graphics spice --network network=default \
+                   --noautoconsole
+    ) &
+
+    notify_info "VM '$name' creating..."
+    until virsh_cmd domstate "$name" 2>/dev/null | grep -qE "running|paused|shut off"; do sleep 1; done
+    virt_viewer "$name" &
+}
+
+#--------------------------------------------------
+# Main
+#--------------------------------------------------
+main() {
+    local sel vm action
+    sel=$(select_vm)
+    [[ $sel == "__NO_VMS__" ]] && { notify_info "No VMs -- creating one."; create_vm; exit; }
+    [[ -z $sel ]] && exit
+
+    if [[ $sel == "Create New VM" ]]; then
+        create_vm
+    else
+        vm=${sel%% *}
+        action=$(select_action "$vm")
+        [[ -n $action ]] && execute_action "$vm" "$action"
+    fi
+}
+
+main

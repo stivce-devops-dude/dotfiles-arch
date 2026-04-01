@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+command -v fuzzel >/dev/null 2>&1 || { echo "fuzzel not found"; exit 1; }
+
+OPTIONS="lock\nrestart\npoweroff\nsuspend"
+CHOICE=$(printf "$OPTIONS" | fuzzel --dmenu --prompt "Choose an action: ") || exit 0
+
+[[ -z "$CHOICE" ]] && exit 0
+
+case "$CHOICE" in
+    lock)
+        "$HOME/.config/hypr/start-hyprlock"
+        ;;
+    restart)
+        systemctl reboot
+        ;;
+    poweroff)
+        systemctl poweroff
+        ;;
+    suspend)
+        systemctl suspend
+        ;;
+    *)
+        exit 1
+        ;;
+esac

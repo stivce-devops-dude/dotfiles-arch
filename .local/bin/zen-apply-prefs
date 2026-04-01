@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SRC="$HOME/.config/zen/user.js"
+[[ -f "$SRC" ]] || { echo "No user.js found at $SRC"; exit 1; }
+
+for profile in "$HOME"/.config/zen/*.Default*; do
+    [[ -d "$profile" ]] || continue
+    cp "$SRC" "$profile/user.js"
+    echo "Applied user.js to $(basename "$profile")"
+done

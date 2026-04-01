@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WORKSPACE="5"
+hyprctl dispatch workspace "$WORKSPACE"
+zen-browser --new-window https://gemini.google.com &

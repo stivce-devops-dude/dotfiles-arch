@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# filename: pick_wallpaper.sh
+
+set -euo pipefail
+
+# ─── ensure we point at YOUR Wayland socket ────────────────────────────────
+: "${XDG_RUNTIME_DIR:=/run/user/$(id -u)}"
+: "${WAYLAND_DISPLAY:=wayland-0}"
+export XDG_RUNTIME_DIR WAYLAND_DISPLAY
+# ──────────────────────────────────────────────────────────────────────────
+
+DAEMON_CMD="awww-daemon --format xrgb --no-cache"
+KILL_CMD="awww kill"
+IMG_CMD="awww img"
+
+# 1) clear the terminal
+clear
+
+# 2) build wallpaper list
+DIR="$HOME/Pictures/wallpapers"
+mapfile -t files < <(find "$DIR" -maxdepth 1 -type f | sort)
+
+if (( ${#files[@]} == 0 )); then
+  echo "No wallpapers found in $DIR"
+  exit 1
+fi
+
+# 3) show numbered menu
+echo
+echo "Choose a wallpaper:"
+for i in "${!files[@]}"; do
+  printf "%3d) %s\n" "$((i+1))" "$(basename "${files[i]}")"
+done
+echo
+
+# 4) read & validate choice
+while true; do
+  read -rp "Enter the number of your choice: " sel
+  if [[ "$sel" =~ ^[0-9]+$ ]] && (( sel >= 1 && sel <= ${#files[@]} )); then
+    break
+  fi
+  echo "Invalid—enter 1 through ${#files[@]}."
+done
+
+FILE="${files[sel-1]}"
+
+# 5) stop old daemon, start new one
+echo
+echo "Stopping existing awww-daemon…"
+XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR WAYLAND_DISPLAY=$WAYLAND_DISPLAY $KILL_CMD || true
+
+echo "Starting awww-daemon…"
+XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR WAYLAND_DISPLAY=$WAYLAND_DISPLAY $DAEMON_CMD &
+
+# 6) give it time to initialize
+sleep 0.5
+
+# 7) apply your chosen wallpaper
+echo "Setting wallpaper to: $(basename "$FILE")"
+XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR WAYLAND_DISPLAY=$WAYLAND_DISPLAY $IMG_CMD "$FILE"
+

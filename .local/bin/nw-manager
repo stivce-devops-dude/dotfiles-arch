@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for cmd in fuzzel nmcli ip awk grep cut sed wl-copy notify-send; do
+    command -v "$cmd" >/dev/null 2>&1 || { echo "$cmd is not found"; exit 1; }
+done
+
+view_info() {
+    local output=""
+    while read -r line; do
+        local iface=$(echo "$line" | awk '{print $1}')
+        [[ -z "$iface" || "$iface" == p2p-* ]] && continue
+
+        local ip4=$(ip -4 addr show "$iface" 2>/dev/null | grep inet | awk '{print $2}' | cut -d/ -f1 | head -n1)
+        local mac=$(ip link show "$iface" 2>/dev/null | awk '/link\/ether/ {print $2}' | head -n1)
+
+        output+="$iface"$'\n'
+        [[ -n "$ip4" ]] && output+="IP: $ip4"$'\n'
+        [[ -n "$mac" ]] && output+="MAC: $mac"$'\n'
+    done < <(nmcli device status | tail -n +2)
+
+    local chosen=$(echo -e "$output" | fuzzel --dmenu --prompt="Select to copy: " --lines=8) || exit 0
+    [[ -z "$chosen" ]] && exit 0
+    echo -n "$chosen" | wl-copy
+    notify-send "Copied to clipboard" "$chosen"
+}
+
+rescan_wifi() {
+    nmcli dev wifi rescan
+    notify-send "Wi-Fi Scan" "Wi-Fi networks rescanned"
+}
+
+connect_wifi() {
+    local networks
+    mapfile -t networks < <(nmcli -t -f SSID,SECURITY,SIGNAL dev wifi list |
+        awk -F: '!seen[$1]++ { printf "%s [%s%%] (%s)\n", $1, $3, ($2=="" ? "open" : $2) }')
+
+    [[ ${#networks[@]} -eq 0 ]] && { notify-send "No Wi-Fi networks found"; exit 0; }
+
+    local chosen=$(printf '%s\n' "${networks[@]}" | fuzzel --dmenu --prompt="Wi-Fi Networks: " --lines=8) || exit 0
+    [[ -z "$chosen" ]] && exit 0
+
+    local ssid=$(echo "$chosen" | sed 's/ \[.*$//')
+
+    if nmcli -t -f ACTIVE,SSID dev wifi | grep -q "^yes:$ssid$"; then
+        notify-send "Already connected to $ssid"
+        return 0
+    fi
+
+    if nmcli -g NAME connection show | grep -Fxq "$ssid"; then
+        nmcli connection up "$ssid" && notify-send "Connected to $ssid"
+    else
+        local pass=$(fuzzel --dmenu --password --prompt="Password for $ssid: ") || exit 0
+        [[ -z "$pass" ]] && { notify-send "No password entered"; return 1; }
+        nmcli dev wifi connect "$ssid" password - <<< "$pass" && notify-send "Connected to $ssid"
+    fi
+}
+
+main_choice=$(printf "View Info\nRescan Wi-Fi\nConnect to Wi-Fi\n" | fuzzel --dmenu --prompt="Network Menu: " --lines=3) || exit 0
+
+case "$main_choice" in
+    "View Info") view_info ;;
+    "Rescan Wi-Fi") rescan_wifi ;;
+    "Connect to Wi-Fi") connect_wifi ;;
+    *) exit 0 ;;
+esac

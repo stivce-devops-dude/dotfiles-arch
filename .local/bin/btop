@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+WORKSPACE="5"
+hyprctl dispatch workspace "$WORKSPACE"
+kitty --detach -e btop

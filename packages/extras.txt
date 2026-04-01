@@ -1,6 +1,0 @@
-# Extras packages for Arch Linux
-# Managed by bootstrap: 14-pacman-extras.sh
-
-ttf-jetbrains-mono-nerd
-noto-fonts
-noto-fonts-emoji

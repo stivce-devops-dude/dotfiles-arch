@@ -23,6 +23,7 @@ dot-os config status.showUntrackedFiles no
 - **Launcher** — `.config/fuzzel/fuzzel.ini`
 - **Notifications** — `.config/swaync/` (config, styling)
 - **Theming** — `.config/gtk-*/`, `.config/qt5ct/`, `.config/qt6ct/`, `.config/matugen/`
+- **Scripts** — `.local/bin/` (fuzzel-launcher, powermenu, vm, battlenet)
 - **Misc** — `.config/xsettingsd/`, `Pictures/wallpapers/`
 
 ## Usage

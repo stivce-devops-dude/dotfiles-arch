@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly PREFIX="$HOME/Games/battlenet"
+readonly GAMEID="umu-battlenet"
+readonly INSTALL_PATH="$PREFIX/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
+readonly SETUP_URL="https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe"
+readonly SETUP_FILE="/tmp/Battle.net-Setup.exe"
+
+if [[ ! -f "$INSTALL_PATH" ]]; then
+    echo "==> Battle.net not found, installing..."
+    curl -Lo "$SETUP_FILE" "$SETUP_URL"
+    WINEPREFIX="$PREFIX" GAMEID="$GAMEID" umu-run "$SETUP_FILE"
+    rm -f "$SETUP_FILE"
+    echo "==> Installation complete."
+fi
+
+pkill -f 'Agent.exe|Battle.net.exe' 2>/dev/null || true
+exec env WINEPREFIX="$PREFIX" GAMEID="$GAMEID" umu-run "$INSTALL_PATH" "$@"
